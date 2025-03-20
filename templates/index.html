@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tello Drone Feed and Task Comparison</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.27.1/slimselect.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #video {
+            width: 100%;
+            max-width: 800px;
+            border: 2px solid black;
+            margin-bottom: 20px;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .column {
+            width: 48%;
+        }
+        select, button, input {
+            margin: 10px 0;
+        }
+        #item-select {
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tello Drone Feed and Task Comparison</h1>
+    
+    <img src="{{ url_for('video_feed') }}" width="640px">
+    
+    <div class="container">
+        <div class="column">
+            <h2>Task Comparison</h2>
+            <label for="item-select">Choose items:</label>
+            <select id="item-select" name="item" multiple>
+                <!-- Options will be populated dynamically -->
+            </select>
+            <div id="quantity-inputs"></div>
+            <button onclick="compareData()">Compare</button>
+            <div id="comparisonResult"></div>
+        </div>
+        <div class="column">
+            <h2>CSV Data</h2>
+            <div id="csvData"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.27.1/slimselect.min.js"></script>
+    <script>
+        // Drone video feed code remains unchanged
+
+        
+
+        // Hardcoded CSV data (replace with actual CSV fetching in production)
+        const csvRawData = `Timestamp	Class	Confidence	X1	Y1	X2	Y2
+2025-02-27 16:08:02	person	0.9624367952	122	177	574	479
+2025-02-27 16:08:04	person	0.9633241892	89	172	573	479
+2025-02-27 16:08:04	cell phone	0.9043473005	141	236	232	406
+2025-02-27 16:08:06	person	0.951475203	121	173	568	479
+2025-02-27 16:08:08	person	0.9613291621	127	175	620	479
+2025-02-27 16:08:08	bottle	0.414542228	405	189	498	385
+2025-02-27 16:08:10	person	0.9605191946	123	175	578	479
+2025-02-27 16:08:12	person	0.9514822364	108	174	566	479
+2025-02-27 16:08:12	cell phone	0.5582945943	152	243	223	360
+2025-02-27 16:08:12	remote	0.3231981099	152	243	223	360
+2025-02-27 16:08:14	person	0.9493926167	121	173	566	479
+2025-02-27 16:08:14	cell phone	0.5941339135	182	236	240	299
+2025-02-27 16:08:16	person	0.9544785023	106	173	566	479
+2025-02-27 16:08:19	person	0.9625621438	125	175	568	479`;
+
+        let processedData = {};
+        let slimSelect;
+
+        function processCSVData(csvData) {
+            const lines = csvData.split('\n');
+            const data = {};
+            
+            lines.slice(1).forEach(line => {
+                const [, item] = line.split('\t');
+                if (item in data) {
+                    data[item]++;
+                } else {
+                    data[item] = 1;
+                }
+            });
+
+            return data;
+        }
+
+        function populateItemSelect() {
+            const itemSelect = document.getElementById('item-select');
+            itemSelect.innerHTML = ''; // Clear existing options
+
+            Object.keys(processedData).forEach(item => {
+                const option = document.createElement('option');
+                option.value = item;
+                option.textContent = item;
+                itemSelect.appendChild(option);
+            });
+
+            // Initialize SlimSelect
+            slimSelect = new SlimSelect({
+                select: '#item-select',
+                placeholder: 'Select items',
+                onChange: (info) => createQuantityInputs()
+            });
+        }
+
+        function createQuantityInputs() {
+            const selectedItems = slimSelect.selected();
+            const quantityInputs = document.getElementById('quantity-inputs');
+            quantityInputs.innerHTML = '';
+
+            selectedItems.forEach(item => {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.min = '0';
+                input.value = '0';
+                input.id = `quantity-${item}`;
+                input.addEventListener('input', function() {
+                    if (this.value < 0) this.value = 0;
+                });
+
+                const label = document.createElement('label');
+                label.htmlFor = input.id;
+                label.textContent = `${item} quantity:`;
+
+                quantityInputs.appendChild(label);
+                quantityInputs.appendChild(input);
+                quantityInputs.appendChild(document.createElement('br'));
+            });
+        }
+
+        function displayCSVData() {
+            const csvDataElement = document.getElementById("csvData");
+            csvDataElement.innerHTML = "";
+            Object.entries(processedData).forEach(([item, quantity]) => {
+                csvDataElement.innerHTML += `<p>${item}: ${quantity}</p>`;
+            });
+        }
+
+        function compareData() {
+            const comparisonResult = document.getElementById("comparisonResult");
+            comparisonResult.innerHTML = "<h3>Comparison Result:</h3>";
+
+            slimSelect.selected().forEach(item => {
+                const quantity = parseInt(document.getElementById(`quantity-${item}`).value);
+                const actualQuantity = processedData[item] || 0;
+
+                if (quantity === actualQuantity) {
+                    comparisonResult.innerHTML += `<p>Match found: ${item} - ${quantity}</p>`;
+                } else {
+                    comparisonResult.innerHTML += `<p>No exact match for ${item}. User input: ${quantity}, Actual count: ${actualQuantity}</p>`;
+                }
+            });
+        }
+
+        // Process and display CSV data when the page loads
+        processedData = processCSVData(csvRawData);
+        populateItemSelect();
+        displayCSVData();
+        createQuantityInputs(); // Initialize quantity inputs
+    </script>
+</body>
+</html>
+
+
