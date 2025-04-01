@@ -1,79 +1,165 @@
-from flask import Flask, Response, render_template
+from djitellopy import Tello
 import cv2
-import torch
+from flask import Flask, Response, render_template
+from ultralytics import YOLO
 import datetime
 import csv
 import time
-from ultralytics import YOLO
+import threading
 
 app = Flask(__name__)
+
+# Initialize Tello
+tello = Tello()
+
+# Connect to the drone and start streaming
+try:
+    tello.connect()
+    print(f"Battery: {tello.get_battery()}%")
+    tello.streamon()
+except Exception as e:
+    print(f"Error connecting to Tello: {e}")
+    tello = None
 
 # Load YOLO model
 model = YOLO("yolov10n.pt")
 
-# Open webcam
-cap = cv2.VideoCapture(1)
-
 csv_filename = "detection_log.csv"
 
-# Open CSV file for logging
-with open(csv_filename, mode="a", newline="") as file:
+# Write CSV header if file is empty
+with open(csv_filename, "a", newline="") as file:
     writer = csv.writer(file)
-    writer.writerow(["Timestamp", "Class", "Confidence", "X1", "Y1", "X2", "Y2"])  # Write header only once
+    writer.writerow(["Timestamp", "Class", "Confidence", "X1", "Y1", "X2", "Y2"])
 
-    last_logged_time = time.time()
+last_logged_time = time.time()
+flight_started = False
+flight_start_time = 0
+flight_thread = None
+stop_flight = False
 
-# Function to generate video frames
+# Function to execute the flight path in a separate thread
+def execute_flight_path():
+    global tello, flight_started, flight_start_time, stop_flight
+    try:
+        print("Takeoff!")
+        tello.takeoff()
+        time.sleep(1)
+
+        distance = 20  # Distance to move in cm
+        speed = 20    # Drone speed in cm/s
+
+        print("Move left")
+        if stop_flight: return
+        tello.go_xyz_speed(-distance, 0, 0, speed)
+        time.sleep(1)
+
+        print("Move right")
+        if stop_flight: return
+        tello.go_xyz_speed(distance, 0, 0, speed)
+        time.sleep(1)
+
+        print("Move left")
+        if stop_flight: return
+        tello.go_xyz_speed(-distance, 0, 0, speed)
+        time.sleep(1)
+
+        print("Move right")
+        if stop_flight: return
+        tello.go_xyz_speed(distance, 0, 0, speed)
+        time.sleep(1)
+
+        flight_start_time = time.time()
+        flight_started = True
+
+        time.sleep(5)  # Land after 5 seconds
+        if stop_flight: return
+        tello.land()
+        print("Landing successful.")
+
+        flight_started = False
+        stop_flight = False
+
+    except Exception as flight_error:
+        print(f"Flight failed: {flight_error}")
+
+# Function to generate video frames with object detection
 def generate_frames():
-    global last_logged_time
+    global last_logged_time, tello, flight_thread, stop_flight
 
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            break
+    if tello is None:
+        print("❌ ERROR: Tello is not initialized. Video feed cannot start.")
+        yield b''
+        return
 
-        results = model(frame)  # Run YOLO detection
+    if not flight_started and (flight_thread is None or not flight_thread.is_alive()):
+        flight_thread = threading.Thread(target=execute_flight_path)
+        flight_thread.start()
 
-        detected_objects = []
+    while True:
+        try:
+            frame = tello.get_frame_read().frame
 
-        for result in results:
-            boxes = result.boxes
-            if boxes is not None:
-                for box in boxes:
-                    x1, y1, x2, y2 = map(int, box.xyxy[0])
-                    conf = float(box.conf[0])
-                    cls = int(box.cls[0])
-                    label = f"{model.model.names[cls]} {conf:.2f}"
+            if frame is None:
+                print("⚠️ WARNING: Failed to capture frame.")
+                continue
 
-                    # Draw bounding box
-                    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                    cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            results = model(frame)
+            detected_objects = []
 
-                    detected_objects.append([
-                        datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3],  
-                        model.model.names[cls], conf, x1, y1, x2, y2
-                    ])
+            for result in results:
+                boxes = result.boxes
+                if boxes is not None:
+                    for box in boxes:
+                        x1, y1, x2, y2 = map(int, box.xyxy[0])
+                        conf = float(box.conf[0])
+                        cls = int(box.cls[0])
+                        label = f"{model.model.names[cls]} {conf:.2f}"
 
-        if detected_objects and time.time() - last_logged_time >= 2:
-            with open(csv_filename, mode="a", newline="") as file:
-                writer = csv.writer(file)
-                writer.writerows(detected_objects)
-            last_logged_time = time.time()
+                        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                        cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
-        # Encode frame as JPEG
-        _, buffer = cv2.imencode(".jpg", frame)
-        frame_bytes = buffer.tobytes()
+                        detected_objects.append([
+                            datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3],
+                            model.model.names[cls], conf, x1, y1, x2, y2
+                        ])
 
-        yield (b"--frame\r\n"
-               b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n")
+            if detected_objects and time.time() - last_logged_time >= 2:
+                with open(csv_filename, "a", newline="") as file:
+                    writer = csv.writer(file)
+                    writer.writerows(detected_objects)
+                last_logged_time = time.time()
 
-@app.route("/")
-def index():
-    return render_template("index.html")
+            battery = tello.get_battery() if tello else "N/A"
+            cv2.putText(frame, f"Battery: {battery}%", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            _, buffer = cv2.imencode(".jpg", frame_rgb)
+            frame_bytes = buffer.tobytes()
+
+            yield (b"--frame\r\n"
+                   b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n")
+
+        except Exception as e:
+            print(f"❌ ERROR in frame processing: {e}")
+            continue
 
 @app.route("/video_feed")
 def video_feed():
     return Response(generate_frames(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
+@app.route("/")
+def index():
+    return render_template("index.html")
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    try:
+        app.run(host="0.0.0.0", port=5000)
+    except KeyboardInterrupt:
+        print("\nShutting down...")
+    finally:
+        stop_flight = True
+        if tello:
+            tello.land()
+            tello.streamoff()
+            tello.end()
+            print("Tello connection closed.")
