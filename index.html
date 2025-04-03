@@ -6,7 +6,7 @@
   <title>Centered Oval Green Button</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: Monaco, monospace;
       max-width: 1200px;
       margin: 0 auto;
       padding: 20px;
@@ -14,11 +14,19 @@
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
-      color: white; /* Adjust text color for visibility if needed */
+      color: white;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin-bottom: 20px; /* Ensures space between image and button */
     }
 
     button {
@@ -33,9 +41,9 @@
   </style>
 </head>
 <body>
-    <a href="./webdeliverable.html" target="_blank">
-        <button>Launch Argos</button>
-    </a>
-    
+  <img src="ARGOS.png" alt="Argos Text" />
+  <a href="./webdeliverable.html" target="_blank">
+    <button>Launch Your Journey Here</button>
+  </a>
 </body>
 </html>
