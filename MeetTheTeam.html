@@ -22,6 +22,27 @@
             width: auto;
             height: 300px; /* Increased height for a larger image */
         }
+        
+        .navbar {
+            width: 100%; /* Full-width navbar */
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center; /* Aligns items in the center */
+            padding: 20px 0;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: #00ff00;
+            padding: 10px 20px; /* Adjust padding for better spacing */
+            text-align: center;
+        }
+
+        .navbar a:hover {
+            background-color: #9c5bd6;
+            color: #ffffff; /* Change text color for better visibility */
+        }
+
         main {
             padding: 40px; /* Move content further up */
             max-width: 1200px;
@@ -69,21 +90,30 @@
             object-position: top;
             margin-right: 20px;
         }
+
         footer {
             text-align: center;
             padding: 20px;
             background-color: rgba(0, 0, 0, 0.7);
         }
+
     </style>
 </head>
 <body>
-
+    <div class="navbar">
+        <a href="./home.html" target="_self">Home</a>
+        <a href="./MeetTheTeam.html" target="_self">Meet The Team</a>
+        <a href="./aboutargos.html" target="_self">About Argos</a>
+        <a href="./liveinaction.html" target="_self">Live In Action </a>
+        <a href="./behindthescenes.html" target="_self">Behind The Scenes </a>
+       
+    </div>
 <header>
-    <!-- Replace header text with "MEET THE TEAM" PNG -->
     <img src="MEETTHETEAM.png" alt="Meet The Team Header" class="header-image">
 </header>
 
 <main>
+    
     <section>
         <p>We are a team of passionate Computer Science students — Rebekah Robinson, Channing Barnes, Caleb Boyce, Izaiah Exum, and Bryce Benson — dedicated to using technology to solve real-world problems. As graduating seniors, we've combined our diverse skill sets in artificial intelligence, software development, and systems engineering to create ARGOS, an innovative drone-based inventory management solution.</p>
 
