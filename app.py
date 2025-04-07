@@ -1,25 +1,11 @@
-from djitellopy import Tello
 import cv2
 from flask import Flask, Response, render_template
 from ultralytics import YOLO
 import datetime
 import csv
 import time
-import threading
 
 app = Flask(__name__)
-
-# Initialize Tello
-tello = Tello()
-
-# Connect to the drone and start streaming
-try:
-    tello.connect()
-    print(f"Battery: {tello.get_battery()}%")
-    tello.streamon()
-except Exception as e:
-    print(f"Error connecting to Tello: {e}")
-    tello = None
 
 # Load YOLO model
 model = YOLO("yolov10n.pt")
@@ -32,78 +18,43 @@ with open(csv_filename, "a", newline="") as file:
     writer.writerow(["Timestamp", "Class", "Confidence", "X1", "Y1", "X2", "Y2"])
 
 last_logged_time = time.time()
-flight_started = False
-flight_start_time = 0
-flight_thread = None
-stop_flight = False
 
-# Function to execute the flight path in a separate thread
-def execute_flight_path():
-    global tello, flight_started, flight_start_time, stop_flight
-    try:
-        print("Takeoff!")
-        tello.takeoff()
-        time.sleep(1)
+def get_webcam():
+    """Tries different webcam inputs until a successful one is found."""
+    for camera_index in range(10):  # Try up to 10 camera indices
+        cap = cv2.VideoCapture(camera_index)
+        if cap.isOpened():
+            print(f"✅ Webcam found at index: {camera_index}")
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)  # Increase resolution
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+            return cap
+        else:
+            cap.release()
+    print("❌ ERROR: Could not find any working webcam.")
+    return None
 
-        distance = 20  # Distance to move in cm
-        speed = 20    # Drone speed in cm/s
-
-        print("Move left")
-        if stop_flight: return
-        tello.go_xyz_speed(-distance, 0, 0, speed)
-        time.sleep(1)
-
-        print("Move right")
-        if stop_flight: return
-        tello.go_xyz_speed(distance, 0, 0, speed)
-        time.sleep(1)
-
-        print("Move left")
-        if stop_flight: return
-        tello.go_xyz_speed(-distance, 0, 0, speed)
-        time.sleep(1)
-
-        print("Move right")
-        if stop_flight: return
-        tello.go_xyz_speed(distance, 0, 0, speed)
-        time.sleep(1)
-
-        flight_start_time = time.time()
-        flight_started = True
-
-        time.sleep(5)  # Land after 5 seconds
-        if stop_flight: return
-        tello.land()
-        print("Landing successful.")
-
-        flight_started = False
-        stop_flight = False
-
-    except Exception as flight_error:
-        print(f"Flight failed: {flight_error}")
-
-# Function to generate video frames with object detection
+# Function to generate video frames with object detection from webcam
 def generate_frames():
-    global last_logged_time, tello, flight_thread, stop_flight
+    global last_logged_time
 
-    if tello is None:
-        print("❌ ERROR: Tello is not initialized. Video feed cannot start.")
+    cap = get_webcam()
+
+    if cap is None:
         yield b''
         return
 
-    if not flight_started and (flight_thread is None or not flight_thread.is_alive()):
-        flight_thread = threading.Thread(target=execute_flight_path)
-        flight_thread.start()
-
     while True:
         try:
-            frame = tello.get_frame_read().frame
+            ret, frame = cap.read()
 
-            if frame is None:
-                print("⚠️ WARNING: Failed to capture frame.")
+            if not ret or frame is None:
+                print("⚠️ WARNING: Failed to capture frame from webcam.")
                 continue
 
-            results = model(frame)
+            # Correct the blue tint (common in webcams)
+            frame_rgb_corrected = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+            results = model(frame_rgb_corrected)
             detected_objects = []
 
             for result in results:
@@ -115,6 +66,7 @@ def generate_frames():
                         cls = int(box.cls[0])
                         label = f"{model.model.names[cls]} {conf:.2f}"
 
+                        # Draw bounding boxes and labels on the ORIGINAL frame
                         cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                         cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
@@ -129,11 +81,8 @@ def generate_frames():
                     writer.writerows(detected_objects)
                 last_logged_time = time.time()
 
-            battery = tello.get_battery() if tello else "N/A"
-            cv2.putText(frame, f"Battery: {battery}%", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-
-            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            _, buffer = cv2.imencode(".jpg", frame_rgb)
+            # Encode the ORIGINAL frame (with drawings) for display
+            _, buffer = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 90])  # Increase JPEG quality
             frame_bytes = buffer.tobytes()
 
             yield (b"--frame\r\n"
@@ -142,6 +91,7 @@ def generate_frames():
         except Exception as e:
             print(f"❌ ERROR in frame processing: {e}")
             continue
+    cap.release()
 
 @app.route("/video_feed")
 def video_feed():
@@ -157,9 +107,4 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("\nShutting down...")
     finally:
-        stop_flight = True
-        if tello:
-            tello.land()
-            tello.streamoff()
-            tello.end()
-            print("Tello connection closed.")
+        print("Webcam feed closed.")
