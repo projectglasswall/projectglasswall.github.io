@@ -10,7 +10,7 @@
             font-family: 'Montserrat', sans-serif;
             margin: 0;
             padding: 0;
-            background: url('imgs/HomePage.jpg') no-repeat center center fixed; /* Set HomePage.jpg as the background */
+            background: url('') no-repeat center center fixed; /* Set HomePage.jpg as the background */
             background-size: cover; /* Ensure it covers the entire page */
             color: #ffffff;
         }
@@ -93,9 +93,31 @@
             padding: 20px;
             background-color: rgba(0, 0, 0, 0.7);
         }
-    </style>
+    
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    position: relative;
+}
+.background-blur {
+    background: url('imgs/HomePage.jpg') no-repeat center center fixed;
+    background-size: cover;
+    filter: blur(8px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+</style>
 </head>
 <body>
+    <div class="background-blur"></div>
 
     <div class="navbar">
         <a href="./home.html" target="_self">Home</a>
@@ -133,5 +155,6 @@
 
 </body>
 </html>
+
 
 
