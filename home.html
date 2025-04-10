@@ -10,40 +10,51 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background: url('imgs/fifthphoto.jpg');
-            background-repeat: no-repeat;
-            background-size: cover; /* Make the image cover the entire background */
-            background-attachment: fixed; /* Keep the background fixed during scrolling */
             color: #ffffff;
-            
+            overflow-x: hidden;
+            position: relative;
         }
+
+        .background-blur {
+            background: url('imgs/fifthphoto.jpg') no-repeat center center fixed;
+            background-size: cover;
+            filter: blur(8px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
         header {
             text-align: center;
             padding: 10px;
         }
+
         .header-image {
             width: auto;
-            height: 300px; /* Increased height for a larger image */
+            height: 300px;
         }
 
         .navbar {
-            width: 100%; /* Full-width navbar */
+            width: 100%;
             background-color: rgba(0, 0, 0, 0.7);
             display: flex;
-            justify-content: center; /* Aligns items in the center */
+            justify-content: center;
             padding: 20px 0;
         }
 
         .navbar a {
             text-decoration: none;
             color: #85fff5;
-            padding: 10px 20px; /* Adjust padding for better spacing */
+            padding: 10px 20px;
             text-align: center;
         }
 
         .navbar a:hover {
             background-color: #9c5bd6;
-            color: #ffffff; /* Change text color for better visibility */
+            color: #ffffff;
         }
 
         .content {
@@ -87,24 +98,23 @@
 </head>
 
 <body>
+    <div class="background-blur"></div>
 
     <div class="navbar">
         <a href="./MeetTheTeam.html" target="_self">Meet The Team</a>
         <a href="./aboutargos.html" target="_self">About Argos</a>
-        <a href="./liveinaction.html" target="_self">Live In Action </a>
-        <a href="./behindthescenes.html" target="_self">Behind The Scenes </a>
-       
+        <a href="./liveinaction.html" target="_self">Live In Action</a>
+        <a href="./behindthescenes.html" target="_self">Behind The Scenes</a>
     </div>
 
     <header>
         <img src="imgs/tellotaskcomparison.png" alt="Tello Task Comparison Header" class="header-image">
     </header>
 
-
     <div class="content">
         <video width="1000px" controls>
             <source src="{{ url_for('static', filename='ArgosHomeVideo.mp4') }}" type="video/mp4">
-             </video>
+        </video>
 
         <div class="container">
             <div class="column">
@@ -125,6 +135,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.27.1/slimselect.min.js"></script>
     <script>
+        // your existing JavaScript remains unchanged...
         const csvRawData = `Timestamp\tClass\tConfidence\tX1\tY1\tX2\tY2
 2025-02-27 16:08:02\tperson\t0.9624367952\t122\t177\t574\t479
 2025-02-27 16:08:04\tperson\t0.9633241892\t89\t172\t573\t479
@@ -171,7 +182,6 @@
             itemSelect.addEventListener('slimselect:selected', createQuantityInputs);
             itemSelect.addEventListener('slimselect:deselected', createQuantityInputs);
         }
-
 
         function createQuantityInputs() {
             const selectedItems = slimSelect.selected();
@@ -229,7 +239,6 @@
                 }
             });
 
-            // Check for items selected by the user that are not in the processed data
             selectedItems.forEach(item => {
                 if (!processedData.hasOwnProperty(item)) {
                     missingItems[item] = parseInt(document.getElementById(`quantity-${item}`).value);
@@ -260,19 +269,18 @@
                     }
                 }
             }
-            // Generate concise summary
+
             let summary = "";
             for (const item in processedData) {
                 summary += `${item}: ${processedData[item]}, `;
             }
             if (summary.endsWith(", ")) {
-                summary = summary.slice(0, -2); // Remove trailing comma and space
+                summary = summary.slice(0, -2);
             }
 
-            // Display summary
             const csvDataElement = document.getElementById("csvData");
-            csvDataElement.innerHTML = ""; // Clear existing content
-            displayCSVData(); // redisplay the table.
+            csvDataElement.innerHTML = "";
+            displayCSVData();
             csvDataElement.innerHTML += `<p>Summary: ${summary}</p>`;
         }
 
