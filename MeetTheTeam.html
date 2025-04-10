@@ -10,7 +10,7 @@
             font-family: 'Montserrat', sans-serif;
             margin: 0;
             padding: 0;
-            background: url('imgs/HomePage.jpg') no-repeat center center fixed; /* Set HomePage.jpg as the background */
+            background: url('') no-repeat center center fixed; /* Set HomePage.jpg as the background */
             background-size: cover; /* Ensure it covers the entire page */
             color: #ffffff;
         }
@@ -102,9 +102,31 @@
             padding: 20px;
             background-color: rgba(0, 0, 0, 0.7);
         }
-    </style>
+    
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    position: relative;
+}
+.background-blur {
+    background: url('imgs/HomePage.jpg') no-repeat center center fixed;
+    background-size: cover;
+    filter: blur(8px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+</style>
 </head>
 <body>
+    <div class="background-blur"></div>
     <div class="navbar">
         <a href="./home.html" target="_self">Home</a>
         <a href="./MeetTheTeam.html" target="_self">Meet The Team</a>
@@ -114,6 +136,7 @@
        
     </div>
 <body>
+    <div class="background-blur"></div>
     
 
 <header>
@@ -133,7 +156,7 @@
         <h2>Team Members</h2>
 
         <div class="team-member">
-            <img src="imgs/RebekahHeadshot.png" alt="Rebekah Robinson">
+            <img src="imgs/Rebekah Headshot.png" alt="Rebekah Robinson">
             <div>
                 <h3><a href="https://www.linkedin.com/in/rebekah-robinson26/">Rebekah Robinson<img src="imgs/linkedin.png" alt="LinkedIn"></a></h3>
                 <p>Honors Computer Science Student at North Carolina Agricultural and Technical State University</p>
@@ -141,7 +164,7 @@
         </div>
 
         <div class="team-member">
-            <img src="imgs/ChanningHeadshot.JPG" alt="Channing Barnes">
+            <img src="imgs/ChanningHeadshot3.JPG" alt="Channing Barnes">
             <div>
                 <h3><a href="https://www.linkedin.com/in/channing-barnes/">Channing Barnes<img src="imgs/linkedin.png" alt="LinkedIn"></a></h3>
                 <p>Computer Science Student at North Carolina Agricultural and Technical State University</p>
@@ -149,7 +172,7 @@
         </div>
 
         <div class="team-member">
-            <img src="imgs/CalebHeadshot.jpg" alt="Caleb Boyce">
+            <img src="imgs/Ambassador Headshot.jpg" alt="Caleb Boyce">
             <div>
                 <h3><a href="https://www.linkedin.com/in/caleb-boyce/">Caleb Boyce<img src="imgs/linkedin.png" alt="LinkedIn"></a></h3>
                 <p>Computer Science Student at North Carolina Agricultural and Technical State University</p>
@@ -157,7 +180,7 @@
         </div>
 
         <div class="team-member">
-            <img src="imgs/IzaiahHeadshot.png" alt="Izaiah Exum">
+            <img src="imgs/Izaiah Headshot.png" alt="Izaiah Exum">
             <div>
                 <h3><a href="https://www.linkedin.com/in/izaiahexum/">Izaiah Exum<img src="imgs/linkedin.png" alt="LinkedIn"></a></h3>
                 <p>Computer Science & Physics Student at North Carolina Agricultural and Technical State University</p>
@@ -165,7 +188,7 @@
         </div>
 
         <div class="team-member">
-            <img src="imgs/BryceHeadshot.jpeg" alt="Bryce Benson">
+            <img src="imgs/Bryce Benson_s Headshot.jpeg" alt="Bryce Benson">
             <div>
                 <h3><a href="https://www.linkedin.com/in/bryce-benson-4023aa226/">Bryce Benson<img src="imgs/linkedin.png" alt="LinkedIn"></a></h3>
                 <p>Computer Science Student at North Carolina Agricultural and Technical State University</p>
@@ -180,3 +203,5 @@
 
 </body>
 </html>
+
+
