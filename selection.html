@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.27.1/slimselect.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('fifthphoto.jpg');
+            background-repeat: no-repeat;
+            background-size: cover; 
+            background-attachment: fixed; 
+            color: #ffffff;
+            
+        }
+        header {
+            text-align: center;
+            padding: 10px;
+        }
+       
+        .image-container {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .header-image {
+        height: 300px;
+        margin: 10px;
+    }
+
+
+        .navbar {
+            width: 100%;
+            background-color: #000000;
+            display: flex;
+            justify-content: center; /* Aligns items in the center */
+            padding: 20px 0;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: #85fff5;
+            padding: 10px 20px; 
+            text-align: center;
+        }
+
+        .navbar a:hover {
+            background-color: #9c5bd6;
+            color: #ffffff; 
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        #video {
+            width: 100%;
+            max-width: 800px;
+            border: 2px solid black;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .column {
+            width: 48%;
+        }
+
+      
+    </style>
+</head>
+
+<body>
+
+    <div class="navbar">
+        <a href="./home.html" target="_self">Home</a>
+        <a href="./MeetTheTeam.html" target="_self">Meet The Team</a>
+        <a href="./aboutargos.html" target="_self">About Argos</a>
+        <a href="./liveinaction.html" target="_self">Live In Action </a>
+        <a href="./behindthescenes.html" target="_self">Behind The Scenes </a>
+       
+    </div>
+
+    <header>
+        <img src="chooseyourpath.png" alt="Tello Task Comparison Header" class="header-image">
+    </header>
+
+    <div class="image-container">
+        <img src="lefttoright.png" alt="Left to Right Option" class="header-image">
+        <img src="upanddown.png" alt="Up and Down Option" class="header-image">
+    </div>
+    
+    <script>
+        function runLeftToRightPath() {
+            fetch('/run-left-to-right')
+                .then(response => response.text())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error));
+        }
+    
+        function runUpAndDownPath() {
+            fetch('/run-up-and-down')
+                .then(response => response.text())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+    
+</body>
+
+</html>
