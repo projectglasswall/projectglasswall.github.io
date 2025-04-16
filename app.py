@@ -101,6 +101,23 @@ def video_feed():
 def index():
     return render_template("index.html")
 
+@app.route('/run-left-to-right')
+def left_to_right():
+    tello.takeoff()
+    tello.move_right(100)
+    tello.move_left(100)
+    tello.land()
+    return "Executed Left to Right Path"
+
+@app.route('/run-up-and-down')
+def up_and_down():
+    tello.takeoff()
+    tello.move_up(100)
+    tello.move_down(100)
+    tello.land()
+    return "Executed Up and Down Path"
+
+
 if __name__ == "__main__":
     try:
         app.run(host="0.0.0.0", port=5000)
