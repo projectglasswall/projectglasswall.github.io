@@ -118,12 +118,25 @@
             margin: 20px 0;
         }
 
-        .video-container video {
+        .video-thumbnail {
             width: 70%;
             max-width: 960px;
-            height: auto;
-            border: 2px solid #85fff5;
-            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .drive-button {
+            background-color: #9c5bd6;
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .drive-button:hover {
+            background-color: #85fff5;
+            color: #000000;
         }
 
         footer {
@@ -153,10 +166,11 @@
     <main>
         <section>
             <div class="video-container">
-                <video controls>
-                    <source src="videos/Behind the Scenes Collage Video.mp4" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
+                <img src="imgs/GroupPhoto.jpg" alt="Behind The Scenes Video Thumbnail" class="video-thumbnail">
+                <br>
+                <a href="https://drive.google.com/file/d/1Pbxs5MMB3rpC1elWpjDQZKvdcIrFDLV6/view" target="_blank" class="drive-button">
+                    🎬 Watch Behind The Scenes
+                </a>
             </div>
         </section>
     </main>
@@ -166,4 +180,5 @@
     </footer>
 </body>
 </html>
+
 
