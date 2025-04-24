@@ -3,64 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Behind the Scenes</title>
+    <title>Meet The Team - Project Glass Wall X Aerospace</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="icon" href="/imgs/argoslogo.png" type="image/png">
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
             margin: 0;
             padding: 0;
             background: #000000;
-            background-size: cover; /* Ensure it covers the entire page */
+            background-size: cover;
             color: #ffffff;
+            position: relative;
         }
+
+        .background-blur {
+            background: url('imgs/fifthphoto.jpg') no-repeat center center fixed;
+            background-size: cover;
+            filter: blur(8px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
         header {
             text-align: center;
             padding: 20px;
         }
+
         .header-image {
             width: auto;
-            height: 300px; /* Increased height for a larger image */
+            height: 300px;
         }
-        
+
         .navbar {
-            width: 100%; /* Full-width navbar */
+            width: 100%;
             background-color: rgba(0, 0, 0, 0.7);
             display: flex;
-            justify-content: center; /* Aligns items in the center */
+            justify-content: center;
             padding: 20px 0;
         }
 
         .navbar a {
             text-decoration: none;
             color: #85fff5;
-            padding: 10px 20px; /* Adjust padding for better spacing */
+            padding: 10px 20px;
             text-align: center;
         }
 
         .navbar a:hover {
             background-color: #9c5bd6;
-            color: #ffffff; /* Change text color for better visibility */
+            color: #ffffff;
         }
 
         main {
-            padding: 40px; /* Move content further up */
+            padding: 40px;
             max-width: 1200px;
             margin: 0 auto;
             text-align: left;
-            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent container for readability */
+            background-color: rgba(0, 0, 0, 0.7);
             border-radius: 10px;
         }
+
         section {
-            margin-bottom: 50px; /* Add more space between sections */
+            margin-bottom: 50px;
         }
+
         h2 {
             color: #ffffff;
             text-transform: uppercase;
             font-weight: 600;
             text-align: center;
         }
+
         .team-member {
             display: flex;
             align-items: center;
@@ -71,18 +88,22 @@
             border-radius: 5px;
             border: 1px solid #240960;
         }
+
         .team-member h3 {
             color: #85fff5;
             margin-top: 0;
-            font-weight: bold; /* Make names bold */
+            font-weight: bold;
         }
+
         .team-member h3 a {
             color: #85fff5;
             text-decoration: none;
         }
+
         .team-member h3 a:hover {
             text-decoration: underline;
         }
+
         .team-member img {
             width: 100px;
             height: 100px;
@@ -92,40 +113,57 @@
             margin-right: 20px;
         }
 
+        .video-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .video-container video {
+            width: 70%;
+            max-width: 960px;
+            height: auto;
+            border: 2px solid #85fff5;
+            border-radius: 10px;
+        }
+
         footer {
             text-align: center;
             padding: 20px;
             background-color: rgba(0, 0, 0, 0.7);
         }
-
     </style>
 </head>
 <body>
+
+    <!-- Background Blur -->
+    <div class="background-blur"></div>
+
     <div class="navbar">
         <a href="./home.html" target="_self">Home</a>
         <a href="./MeetTheTeam.html" target="_self">Meet The Team</a>
         <a href="./aboutargos.html" target="_self">About Argos</a>
-        <a href="./liveinaction.html" target="_self">Live In Action </a>
-        <a href="./behindthescenes.html" target="_self">Behind The Scenes </a>
-       
+        <a href="./liveinaction.html" target="_self">Live In Action</a>
+        <a href="./behindthescenes.html" target="_self">Behind The Scenes</a>
     </div>
-<header>
-    <img src="imgs/behindthescenes.png" alt="Live in Action" class="header-image">
-</header>
 
-<main>
-      
-    <section>
-        <p>This page will showcase all of the progess our group has made throughout the duration of the school year.</p>
-        
-            </section>
-      
-</main>
+    <header>
+        <img src="imgs/behindthescenes.png" alt="Live in Action" class="header-image">
+    </header>
 
-<footer>
-    &copy; 2025 Project Glass Wall x Aerospace - North Carolina A&T State University
-</footer>
+    <main>
+        <section>
+            <div class="video-container">
+                <video controls>
+                    <source src="videos/Behind the Scenes Collage Video.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </section>
+    </main>
 
+    <footer>
+        &copy; 2025 Project Glass Wall x Aerospace - North Carolina A&T State University
+    </footer>
 </body>
 </html>
 
